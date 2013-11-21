@@ -11,12 +11,16 @@ class UpdateCardRequest extends AbstractRequest
     {
         $data = array();
         $data['description'] = $this->getDescription();
+        $data['email'] = $this->getEmail();
 
         if ($this->getToken()) {
             $data['card'] = $this->getToken();
         } elseif ($this->getCard()) {
             $data['card'] = $this->getCardData();
-            $data['email'] = $this->getCard()->getEmail();
+            if (!$data['email']) {
+                // Set email in case not already set
+                $data['email'] = $this->getCard()->getEmail();
+            }
         }
 
         $this->validate('cardReference');
@@ -26,6 +30,6 @@ class UpdateCardRequest extends AbstractRequest
 
     public function getEndpoint()
     {
-        return $this->endpoint.'/customers/'.$this->getCardReference();
+        return $this->endpoint . '/customers/' . $this->getCardReference();
     }
 }

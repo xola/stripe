@@ -10,6 +10,7 @@ class UpdateCardRequestTest extends TestCase
     {
         $this->request = new UpdateCardRequest($this->getHttpClient(), $this->getHttpRequest());
         $this->request->setCardReference('cus_1MZSEtqSghKx99');
+        $this->request->setEmail('test@example.com');
     }
 
     public function testEndpoint()

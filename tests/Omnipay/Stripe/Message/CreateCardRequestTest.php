@@ -10,6 +10,7 @@ class CreateCardRequestTest extends TestCase
     {
         $this->request = new CreateCardRequest($this->getHttpClient(), $this->getHttpRequest());
         $this->request->setCard($this->getValidCard());
+        $this->request->setEmail('test@example.com');
     }
 
     public function testEndpoint()
