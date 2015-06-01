@@ -19,6 +19,16 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         return $this->setParameter('apiKey', $value);
     }
 
+    public function getApiVersion()
+    {
+        return $this->getParameter('apiVersion');
+    }
+
+    public function setApiVersion($value)
+    {
+        return $this->setParameter('apiVersion', $value);
+    }
+
     /**
      * @deprecated
      */
@@ -70,9 +80,14 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
             null,
             $data
         );
-        $httpResponse = $httpRequest
-            ->setHeader('Authorization', 'Basic '.base64_encode($this->getApiKey().':'))
-            ->send();
+        $httpRequest->setHeader('Authorization', 'Basic '.base64_encode($this->getApiKey().':'));
+        $apiVersion = $this->getApiVersion();
+        if (!empty($apiVersion)) {
+            // If user has set an API version use that https://stripe.com/docs/api#versioning
+            $httpRequest->setHeader('Stripe-Version', $this->getApiVersion());
+        }
+
+        $httpResponse = $httpRequest->send();
 
         return $this->response = new Response($this, $httpResponse->json());
     }
