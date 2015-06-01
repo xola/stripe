@@ -17,8 +17,8 @@ class AbstractRequestTest extends TestCase
         $response = m::mock('\Guzzle\Http\Message\Response')->shouldReceive('json')->getMock();
 
         $request = $this->getMockRequest()
-            ->shouldReceive('setHeader')->once()->withArgs(['Authorization', 'Basic Og=='])
-            ->shouldReceive('setHeader')->once()->withArgs(['Stripe-Version', $apiVersion])
+            ->shouldReceive('setHeader')->once()->withArgs(array('Authorization', 'Basic Og=='))
+            ->shouldReceive('setHeader')->once()->withArgs(array('Stripe-Version', $apiVersion))
             ->shouldReceive('send')->andReturn($response)
             ->getMock();
 
