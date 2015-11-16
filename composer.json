@@ -22,11 +22,17 @@
             "homepage": "https://github.com/omnipay/stripe/contributors"
         }
     ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/xola/omnipay-common"
+        }
+    ],
     "autoload": {
         "psr-0": { "Omnipay\\Stripe\\" : "src/" }
     },
     "require": {
-        "omnipay/common": "~2.0"
+        "omnipay/common": "dev-xola"
     },
     "require-dev": {
         "omnipay/tests": "~2.0"
