@@ -97,6 +97,9 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         $this->getCard()->validate();
 
         $data = array();
+        if (!empty($this->getCard()->getSwipeData())) {
+            return array('swipe_data' => $this->getCard()->getSwipeData());
+        }
         $data['number'] = $this->getCard()->getNumber();
         $data['exp_month'] = $this->getCard()->getExpiryMonth();
         $data['exp_year'] = $this->getCard()->getExpiryYear();
