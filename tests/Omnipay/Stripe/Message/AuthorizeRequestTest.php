@@ -59,15 +59,15 @@ class AuthorizeRequestTest extends TestCase
         $this->assertSame($card['number'], $data['card']['number']);
     }
 
-    public function testDataWithCardSwipeData()
+    public function testDataWithTracks()
     {
-        $swipeData = "%25B4242424242424242%5ETESTLAST%2FTESTFIRST%5E1505201425400714000000%3F";
+        $tracks = "%25B4242424242424242%5ETESTLAST%2FTESTFIRST%5E1505201425400714000000%3F";
         $card = $this->getValidCard();
-        $card['swipeData'] = $swipeData;
+        $card['tracks'] = $tracks;
         $this->request->setCard($card);
         $data = $this->request->getData();
 
-        $this->assertSame($swipeData, $data['card']['swipe_data']);
+        $this->assertSame($tracks, $data['card']['swipe_data']);
         $this->assertCount(1, $data['card'], "Only swipe data should be present. All other fields are not required");
     }
 
