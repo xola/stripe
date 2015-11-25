@@ -32,7 +32,7 @@
         "psr-0": { "Omnipay\\Stripe\\" : "src/" }
     },
     "require": {
-        "omnipay/common": "dev-xola"
+        "omnipay/common": "~2.4.2"
     },
     "require-dev": {
         "omnipay/tests": "~2.0"
