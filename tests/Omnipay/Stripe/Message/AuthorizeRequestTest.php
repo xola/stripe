@@ -61,6 +61,20 @@ class AuthorizeRequestTest extends TestCase
 
     public function testDataWithTracks()
     {
+      $tracks = "%25B4242424242424242%5ETESTLAST%2FTESTFIRST%5E1505201425400714000000%3F";
+      $card = $this->getValidCard();
+      $card['tracks'] = $tracks;
+      unset($card['cvv']);
+      unset($card['billingPostcode']);
+      $this->request->setCard($card);
+      $data = $this->request->getData();
+
+      $this->assertSame($tracks, $data['card']['swipe_data']);
+      $this->assertCount(1, $data['card'], "Swipe data should be present. All other fields are not required");
+    }
+
+    public function testDataWithTracksAndZipCVVManuallyEntered()
+    {
         $tracks = "%25B4242424242424242%5ETESTLAST%2FTESTFIRST%5E1505201425400714000000%3F";
         $card = $this->getValidCard();
         $card['tracks'] = $tracks;
@@ -68,7 +82,9 @@ class AuthorizeRequestTest extends TestCase
         $data = $this->request->getData();
 
         $this->assertSame($tracks, $data['card']['swipe_data']);
-        $this->assertCount(1, $data['card'], "Only swipe data should be present. All other fields are not required");
+        $this->assertSame($card['cvv'], $data['card']['cvc']);
+        $this->assertSame($card['billingPostcode'], $data['card']['address_zip']);
+        $this->assertCount(3, $data['card'], "Swipe data, cvv and zip code should be present");
     }
 
     public function testSendSuccess()
