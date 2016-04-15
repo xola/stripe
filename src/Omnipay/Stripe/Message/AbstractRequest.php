@@ -98,12 +98,14 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 
         $data = array();
         $tracks = $this->getCard()->getTracks();
+        $cvv = $this->getCard()->getCvv();
+        $postcode = $this->getCard()->getPostcode();
 
-        if (!empty($this->getCard()->getPostcode())) {
-            $data['address_zip'] = $this->getCard()->getPostcode();
+        if (!empty($postcode)) {
+            $data['address_zip'] = $postcode;
         }
-        if (!empty($this->getCard()->getCvv())) {
-            $data['cvc'] = $this->getCard()->getCvv();
+        if (!empty($cvv)) {
+            $data['cvc'] = $cvv;
         }
 
         if (!empty($tracks)) {
