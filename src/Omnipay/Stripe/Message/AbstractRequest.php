@@ -100,15 +100,15 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         $tracks = $this->getCard()->getTracks();
 
         if (!empty($this->getCard()->getPostcode())) {
-          $data['address_zip'] = $this->getCard()->getPostcode();
+            $data['address_zip'] = $this->getCard()->getPostcode();
         }
         if (!empty($this->getCard()->getCvv())) {
-          $data['cvc'] = $this->getCard()->getCvv();
+            $data['cvc'] = $this->getCard()->getCvv();
         }
 
         if (!empty($tracks)) {
-          $data['swipe_data'] = $tracks;
-          return $data;
+            $data['swipe_data'] = $tracks;
+            return $data;
         }
         $data['number'] = $this->getCard()->getNumber();
         $data['exp_month'] = $this->getCard()->getExpiryMonth();
