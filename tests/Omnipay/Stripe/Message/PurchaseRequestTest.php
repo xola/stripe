@@ -50,6 +50,17 @@ class PurchaseRequestTest extends TestCase
         $this->assertEquals($expected, $data);
     }
 
+    public function testShouldUseOlderKeyOfStatementDescriptorWhenApiVersionIsBeforeDec2014()
+    {
+        $this->request->setApiVersion('2014-06-17');
+
+        $data = $this->request->getData();
+
+        $this->assertFalse(isset($data['statement_descriptor']), 'statement_descriptor should not be used for older version of the API');
+        $this->assertNotNull($data['statement_description'], 'statement_description should be used for this api version');
+        $this->assertEquals('FOO', $data['statement_description']);
+    }
+
     public function testCaptureIsTrue()
     {
         $data = $this->request->getData();
