@@ -24,7 +24,7 @@ class PurchaseRequestTest extends TestCase
         );
     }
 
-    public function testShouldReturnDataVersionOfCard()
+    public function testShouldReturnDataAsAnArray()
     {
         $data = $this->request->getData();
         $expected = array(
