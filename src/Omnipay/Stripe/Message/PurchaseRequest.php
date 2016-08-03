@@ -7,11 +7,20 @@ namespace Omnipay\Stripe\Message;
  */
 class PurchaseRequest extends AuthorizeRequest
 {
+    const API_VERSION_STATEMENT_DESCRIPTOR = "2014-12-17";
+
     public function getData()
     {
         $data = parent::getData();
         $data['capture'] = 'true';
-        $data['statement_description'] = $this->getStatementDescriptor();
+
+        $apiVersion = $this->getApiVersion();
+        if (is_null($apiVersion) || (!is_null($apiVersion) && $apiVersion >= self::API_VERSION_STATEMENT_DESCRIPTOR)) {
+            $data['statement_descriptor'] = $this->getStatementDescriptor();
+        } else {
+            $data['statement_description'] = $this->getStatementDescriptor();
+        }
+
         return $data;
     }
 
