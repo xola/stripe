@@ -305,7 +305,25 @@ class Response extends AbstractResponse
     public function getCode()
     {
         if (!$this->isSuccessful()) {
-            return $this->data['error']['code'];
+            // Check for code, if not present return the type, because not all failed responses have a code.
+            $code = isset($this->data['error']['code']) ? $this->data['error']['code'] : null;
+            return ($code) ? $code : $this->getType();
+        }
+
+        return null;
+    }
+
+    /**
+     * The type of error returned
+     *
+     * Returns null if the request was successful
+     *
+     * @return null
+     */
+    public function getType()
+    {
+        if (!$this->isSuccessful()) {
+            return $this->data['error']['type'];
         }
 
         return null;
