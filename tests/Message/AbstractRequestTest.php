@@ -56,33 +56,4 @@ class AbstractRequestTest extends TestCase
         $this->assertSame($this->request, $this->request->setMetadata(array('foo' => 'bar')));
         $this->assertSame(array('foo' => 'bar'), $this->request->getMetadata());
     }
-
-    /*
-    public function testSendDataSetsApiVersionIfPresent()
-    {
-        $apiVersion = '2014-10-12';
-
-        $eventDispatcher = Mockery::mock('\Symfony\Component\EventDispatcher\EventDispatcherInterface')
-            ->shouldReceive('addListener')->getMock();
-
-        $response = Mockery::mock('\Guzzle\Http\Message\Response')->shouldReceive('json')->getMock();
-
-        $request = $this->getMockRequest()
-            ->shouldReceive('setHeader')->once()->withArgs(array('Authorization', 'Basic Og=='))
-            ->shouldReceive('setHeader')->once()->withArgs(array('Stripe-Version', $apiVersion))
-            ->shouldReceive('send')->andReturn($response)
-            ->getMock();
-
-        $httpClient = Mockery::mock('Guzzle\Http\ClientInterface')
-            ->shouldReceive('getEventDispatcher')->andReturn($eventDispatcher)
-            ->shouldReceive('createRequest')->andReturn($request)
-            ->getMock();
-
-        $request = Mockery::mock('\Omnipay\Stripe\Message\AbstractRequest[getEndPoint,getApiVersion]', array($httpClient, $this->getHttpRequest()));
-        $request->shouldReceive('getApiVersion')->andReturn($apiVersion);
-        $request->shouldReceive('getEndpoint')->andReturn('foo');
-
-        $request->sendData(array('foo' => 'bar'));
-    }
-    */
 }

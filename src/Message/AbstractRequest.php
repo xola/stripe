@@ -169,9 +169,13 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
             null,
             $data
         );
-        $httpResponse = $httpRequest
-            ->setHeader('Authorization', 'Basic '.base64_encode($this->getApiKey().':'))
-            ->send();
+        $httpRequest->setHeader('Authorization', 'Basic '.base64_encode($this->getApiKey().':'));
+        $apiVersion = $this->getApiVersion();
+        if (!empty($apiVersion)) {
+            // If user has set an API version use that https://stripe.com/docs/api#versioning
+            $httpRequest->setHeader('Stripe-Version', $this->getApiVersion());
+        }
+        $httpResponse = $httpRequest->send();
         
         $this->response = new Response($this, $httpResponse->json());
         
