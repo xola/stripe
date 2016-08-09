@@ -228,8 +228,9 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         if ($card->getCvv()) {
             $data['cvc'] = $card->getCvv();
         }
-        if (!empty($card->getTracks())) {
-            $data['swipe_data'] = $card->getTracks();
+        $tracks = $card->getTracks();
+        if (!empty($tracks)) {
+            $data['swipe_data'] = $tracks;
             return $data;
         }
 
