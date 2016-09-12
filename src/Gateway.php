@@ -147,6 +147,33 @@ class Gateway extends AbstractGateway
     }
 
     /**
+     * Sets the API version
+     *
+     * By default all requests will use your account's API settings. However
+     * for every API call you can specify an optional version. When a valid
+     * API version is specified that request will use that version of the API
+     * instead of the version configured in your account settings
+     *
+     * @param string $value
+     *
+     * @return Gateway provides a fluent interface
+     */
+    public function setApiVersion($value)
+    {
+        return $this->setParameter('apiVersion', $value);
+    }
+
+    /**
+     * Returns the API version configured for this gateway
+     *
+     * @return string
+     */
+    public function getApiVersion()
+    {
+        return $this->getParameter('apiVersion');
+    }
+
+    /**
      * Authorize Request.
      *
      * An Authorize request is similar to a purchase request but the
