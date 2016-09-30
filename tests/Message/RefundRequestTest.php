@@ -6,6 +6,9 @@ use Omnipay\Tests\TestCase;
 
 class RefundRequestTest extends TestCase
 {
+    /** @var RefundRequest $request */
+    private $request;
+
     public function setUp()
     {
         $this->request = new RefundRequest($this->getHttpClient(), $this->getHttpRequest());
@@ -28,6 +31,16 @@ class RefundRequestTest extends TestCase
     {
         $data = $this->request->getData();
         $this->assertEquals("true", $data['refund_application_fee']);
+    }
+
+    public function testShouldSetReverseTransferFlag()
+    {
+        $this->request->setTransactionReference('ch_12RgN9L7XhO9mI')->setAmount('10.00');
+        $this->request->setReverseTransfer(true);
+
+        $data = $this->request->getData();
+
+        $this->assertEquals("true", $data['reverse_transfer']);
     }
 
     public function testSendSuccess()
