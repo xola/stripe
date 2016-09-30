@@ -78,6 +78,31 @@ class RefundRequest extends AbstractRequest
         return $this->setParameter('refundApplicationFee', $value);
     }
 
+    /**
+     * @return bool Whether the charge transfer should be reversed
+     */
+    public function getReverseTransfer()
+    {
+        return $this->getParameter('reverseTransfer');
+    }
+
+    /**
+     * Whether to reverse the transfer associated with the charge.
+     *
+     * When refunding a charge that has a destination value, by default the destination account will keep the funds that
+     * were transferred to it, leaving the platform account to cover the negative balance from the refund. To pull back
+     * the funds from the connected account to cover the refund, set the reverse_transfer parameter to true when
+     * creating the refund
+     *
+     * @param bool $value Whether the transfer should be reversed or not
+     *
+     * @return \Omnipay\Common\Message\AbstractRequest
+     */
+    public function setReverseTransfer($value)
+    {
+        return $this->setParameter('reverseTransfer', $value);
+    }
+
     public function getData()
     {
         $this->validate('transactionReference', 'amount');
@@ -87,6 +112,10 @@ class RefundRequest extends AbstractRequest
 
         if ($this->getRefundApplicationFee()) {
             $data['refund_application_fee'] = 'true';
+        }
+
+        if ($this->getReverseTransfer()) {
+            $data['reverse_transfer'] = 'true';
         }
 
         return $data;
