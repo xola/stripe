@@ -73,6 +73,20 @@ class PurchaseRequest extends AuthorizeRequest
         $data = parent::getData();
         $data['capture'] = 'true';
 
+        if ($level3 = $this->getLevel3()) {
+            $data['level3'] = $level3;
+        }
+
         return $data;
+    }
+
+    public function setLevel3($value)
+    {
+        return $this->setParameter('level3', $value);
+    }
+
+    public function getLevel3()
+    {
+        return $this->getParameter('level3');
     }
 }

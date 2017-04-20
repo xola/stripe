@@ -31,10 +31,11 @@ class GatewayTest extends GatewayTestCase
 
     public function testPurchase()
     {
-        $request = $this->gateway->purchase(array('amount' => '10.00'));
+        $request = $this->gateway->purchase(array('amount' => '10.00', 'level3' => []));
 
         $this->assertInstanceOf('Omnipay\Stripe\Message\PurchaseRequest', $request);
         $this->assertSame('10.00', $request->getAmount());
+        $this->assertSame([], $request->getLevel3());
     }
 
     public function testRefund()
