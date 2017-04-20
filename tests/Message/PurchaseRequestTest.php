@@ -55,18 +55,18 @@ class PurchaseRequestTest extends TestCase
 
     public function testShouldReturnLevel3DataIfPresent()
     {
-        $level3Data = [
+        $level3Data = array(
             'merchant_reference' => '1245',
             'shipping_amount' => 0,
-            'line_items' => [
+            'line_items' => array(
                 'product_code' => '123',
                 'product_description' => 'Experience title',
                 'unit_cost' => 1000,
                 'quantity' => 1,
                 'tax_amount' => 100,
                 'discount_amount' => 0,
-            ]
-        ];
+            )
+        );
         $this->request->initialize(
             array(
                 'amount' => '10.00',
