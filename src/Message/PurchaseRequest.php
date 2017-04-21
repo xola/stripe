@@ -73,8 +73,7 @@ class PurchaseRequest extends AuthorizeRequest
         $data = parent::getData();
         $data['capture'] = 'true';
 
-        if ($items = $this->getItems())
-        {
+        if ($items = $this->getItems()) {
             $lineItems = [];
             foreach ($items as $item) {
                 $lineItem = [];
