@@ -73,20 +73,28 @@ class PurchaseRequest extends AuthorizeRequest
         $data = parent::getData();
         $data['capture'] = 'true';
 
-        if ($level3 = $this->getLevel3()) {
-            $data['level3'] = $level3;
+        if ($items = $this->getItems())
+        {
+            $lineItems = [];
+            foreach ($items as $item) {
+                $lineItem = [];
+                $lineItem['product_code'] = $item->getName();
+                $lineItem['product_description'] = $item->getDescription();
+                $lineItem['unit_cost'] = $this->getAmountWithCurrencyPrecision($item->getPrice());
+                $lineItem['quantity'] = $item->getQuantity();
+                $lineItems[] = $lineItem;
+            }
+            $data['level3'] = [
+                'merchant_reference' => $this->getTransactionId(),
+                'line_items' => $lineItems
+            ];
         }
 
         return $data;
     }
 
-    public function setLevel3($value)
+    private function getAmountWithCurrencyPrecision($amount)
     {
-        return $this->setParameter('level3', $value);
-    }
-
-    public function getLevel3()
-    {
-        return $this->getParameter('level3');
+        return (int)round($amount * pow(10, $this->getCurrencyDecimalPlaces()));
     }
 }

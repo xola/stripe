@@ -55,25 +55,27 @@ class PurchaseRequestTest extends TestCase
 
     public function testShouldReturnLevel3DataIfPresent()
     {
-        $level3Data = array(
-            'merchant_reference' => '1245',
-            'shipping_amount' => 0,
-            'line_items' => array(
-                'product_code' => '123',
-                'product_description' => 'Experience title',
-                'unit_cost' => 1000,
-                'quantity' => 1,
-                'tax_amount' => 100,
-                'discount_amount' => 0,
-            )
-        );
         $this->request->initialize(
             array(
                 'amount' => '10.00',
+                'transactionId' => 'TXN_ID',
                 'currency' => 'USD',
                 'card' => $this->card,
-                'statementDescriptor' => "FOO",
-                'level3' => $level3Data
+                'statementDescriptor' => "BOBS ANTIQUES",
+                'items' => array(
+                    array(
+                        'name' => '123',
+                        'description' => 'Floppy disk',
+                        'price' => 5,
+                        'quantity' => 3
+                    ),
+                    array(
+                        'name' => '12345',
+                        'description' => 'Bluray',
+                        'price' => 20,
+                        'quantity' => 1
+                    )
+                )
             )
         );
         $expected = array(
@@ -94,11 +96,26 @@ class PurchaseRequestTest extends TestCase
                 'object' => 'card',
                 'email' => null
             ),
-            'statement_descriptor' => 'FOO',
+            'statement_descriptor' => 'BOBS ANTIQUES',
             'description' => null,
             'capture' => 'true',
             'metadata' => null,
-            'level3' => $level3Data
+            'level3' => array(
+                'merchant_reference' => 'TXN_ID',
+                'line_items' => array(
+                    array(
+                        'product_code' => '123',
+                        'product_description' => 'Floppy disk',
+                        'unit_cost' => 500,
+                        'quantity' => 3,
+                    ),
+                    array(
+                        'product_code' => '12345',
+                        'product_description' => 'Bluray',
+                        'unit_cost' => 2000,
+                        'quantity' => 1,
+                    ))
+            )
         );
 
         $data = $this->request->getData();
