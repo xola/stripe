@@ -74,7 +74,7 @@ class PurchaseRequest extends AuthorizeRequest
         $data['capture'] = 'true';
 
         if ($items = $this->getItems()) {
-            $lineItems = [];
+            $lineItems = array();
             foreach ($items as $item) {
                 $lineItem = [];
                 $lineItem['product_code'] = $item->getName();
