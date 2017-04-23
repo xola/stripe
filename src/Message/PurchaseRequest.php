@@ -76,17 +76,19 @@ class PurchaseRequest extends AuthorizeRequest
         if ($items = $this->getItems()) {
             $lineItems = array();
             foreach ($items as $item) {
-                $lineItem = [];
+                $lineItem = array();
                 $lineItem['product_code'] = $item->getName();
                 $lineItem['product_description'] = $item->getDescription();
                 $lineItem['unit_cost'] = $this->getAmountWithCurrencyPrecision($item->getPrice());
+                $lineItem['tax_amount'] = $this->getAmountWithCurrencyPrecision($item->getTaxes());
+                $lineItem['discount_amount'] = $this->getAmountWithCurrencyPrecision($item->getDiscount());
                 $lineItem['quantity'] = $item->getQuantity();
                 $lineItems[] = $lineItem;
             }
-            $data['level3'] = [
+            $data['level3'] = array(
                 'merchant_reference' => $this->getTransactionId(),
                 'line_items' => $lineItems
-            ];
+            );
         }
 
         return $data;

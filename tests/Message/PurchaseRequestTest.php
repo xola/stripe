@@ -67,12 +67,16 @@ class PurchaseRequestTest extends TestCase
                         'name' => '123',
                         'description' => 'Floppy disk',
                         'price' => 5,
+                        'taxes' => 1,
+                        'discount' => 2,
                         'quantity' => 3
                     ),
                     array(
                         'name' => '12345',
                         'description' => 'Bluray',
                         'price' => 20,
+                        'taxes' => 2,
+                        'discount' => 3,
                         'quantity' => 1
                     )
                 )
@@ -108,12 +112,16 @@ class PurchaseRequestTest extends TestCase
                         'product_description' => 'Floppy disk',
                         'unit_cost' => 500,
                         'quantity' => 3,
+                        'tax_amount' => 100,
+                        'discount_amount' => 200
                     ),
                     array(
                         'product_code' => '12345',
                         'product_description' => 'Bluray',
                         'unit_cost' => 2000,
                         'quantity' => 1,
+                        'tax_amount' => 200,
+                        'discount_amount' => 300,
                     ))
             )
         );
