@@ -53,11 +53,11 @@ class PurchaseRequestTest extends TestCase
         $this->assertEquals($expected, $data);
     }
 
-    public function testShouldReturnLevel3DataIfPresent()
+    public function testShouldReturnLevel3DataIfItemsPresent()
     {
         $this->request->initialize(
             array(
-                'amount' => '10.00',
+                'amount' => '33.00',
                 'transactionId' => 'TXN_ID',
                 'currency' => 'USD',
                 'card' => $this->card,
@@ -72,8 +72,8 @@ class PurchaseRequestTest extends TestCase
                         'quantity' => 3
                     ),
                     array(
-                        'name' => '12345',
-                        'description' => 'Bluray',
+                        'name' => '1234567890123456',
+                        'description' => 'Bluray Very Very Long Description',
                         'price' => 20,
                         'taxes' => 2,
                         'discount' => 3,
@@ -83,7 +83,7 @@ class PurchaseRequestTest extends TestCase
             )
         );
         $expected = array(
-            'amount' => 1000,
+            'amount' => 3300,
             'currency' => 'usd',
             'source' => array(
                 'number' => '4111111111111111',
@@ -116,14 +116,72 @@ class PurchaseRequestTest extends TestCase
                         'discount_amount' => 200
                     ),
                     array(
-                        'product_code' => '12345',
-                        'product_description' => 'Bluray',
+                        'product_code' => '123456789012',
+                        'product_description' => 'Bluray Very Very Long Desc',
                         'unit_cost' => 2000,
                         'quantity' => 1,
                         'tax_amount' => 200,
                         'discount_amount' => 300,
                     ))
             )
+        );
+
+        $data = $this->request->getData();
+
+        $this->assertEquals($expected, $data);
+    }
+
+    public function testShouldNotReturnLevel3DataIfItemsAmountsDoNotAddUpToAmountCharged()
+    {
+        $this->request->initialize(
+            array(
+                'amount' => '10.00',
+                'transactionId' => 'TXN_ID',
+                'currency' => 'USD',
+                'card' => $this->card,
+                'statementDescriptor' => "BOBS ANTIQUES",
+                'items' => array(
+                    array(
+                        'name' => '123',
+                        'description' => 'Floppy disk',
+                        'price' => 5,
+                        'taxes' => 1,
+                        'discount' => 2,
+                        'quantity' => 3
+                    ),
+                    array(
+                        'name' => '1234567890123456',
+                        'description' => 'Bluray Very Very Long Description',
+                        'price' => 20,
+                        'taxes' => 2,
+                        'discount' => 3,
+                        'quantity' => 1
+                    )
+                )
+            )
+        );
+        $expected = array(
+            'amount' => 1000,
+            'currency' => 'usd',
+            'source' => array(
+                'number' => '4111111111111111',
+                'address_zip' => '12345',
+                'cvc' => $this->card['cvv'],
+                'exp_month' => $this->card['expiryMonth'],
+                'exp_year' => $this->card['expiryYear'],
+                'name' => 'Example User',
+                'address_line1' => '123 Billing St',
+                'address_line2' => 'Billsville',
+                'address_city' => 'Billstown',
+                'address_state' => 'CA',
+                'address_country' => 'US',
+                'object' => 'card',
+                'email' => null
+            ),
+            'statement_descriptor' => 'BOBS ANTIQUES',
+            'description' => null,
+            'capture' => 'true',
+            'metadata' => null
         );
 
         $data = $this->request->getData();
