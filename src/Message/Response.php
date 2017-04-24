@@ -113,9 +113,15 @@ class Response extends AbstractResponse
     public function getCardReference()
     {
         if (isset($this->data['object']) && 'customer' === $this->data['object']) {
-            if (!empty($this->data['default_card'])) {
+
+            if (isset($this->data['default_source']) && !empty($this->data['default_source'])) {
+                return $this->data['default_source'];
+            }
+
+            if (isset($this->data['default_card']) && !empty($this->data['default_card'])) {
                 return $this->data['default_card'];
             }
+
             if (!empty($this->data['id'])) {
                 return $this->data['id'];
             }
@@ -288,7 +294,7 @@ class Response extends AbstractResponse
      */
     public function getMessage()
     {
-        if (!$this->isSuccessful()) {
+        if (!$this->isSuccessful() && isset($this->data['error']) && isset($this->data['error']['message'])) {
             return $this->data['error']['message'];
         }
 
@@ -304,7 +310,7 @@ class Response extends AbstractResponse
      */
     public function getCode()
     {
-        if (!$this->isSuccessful()) {
+        if (!$this->isSuccessful() && isset($this->data['error']) && isset($this->data['error']['code'])) {
             // Check for code, if not present return the type, because not all failed responses have a code.
             $code = isset($this->data['error']['code']) ? $this->data['error']['code'] : null;
             return ($code) ? $code : $this->getType();
