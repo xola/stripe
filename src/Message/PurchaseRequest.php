@@ -5,6 +5,8 @@
  */
 namespace Omnipay\Stripe\Message;
 
+use Omnipay\Common\ItemBag;
+
 /**
  * Stripe Purchase Request.
  *
@@ -72,7 +74,39 @@ class PurchaseRequest extends AuthorizeRequest
     {
         $data = parent::getData();
         $data['capture'] = 'true';
+        $items = $this->getItems();
+        if ($items && $this->validateLineItemAmounts($items)) {
+            $lineItems = array();
+            foreach ($items as $item) {
+                $lineItem = array();
+                $lineItem['product_code'] = substr($item->getName(), 0, 12);
+                $lineItem['product_description'] = substr($item->getDescription(), 0, 26);
+                $lineItem['unit_cost'] = $this->getAmountWithCurrencyPrecision($item->getPrice());
+                $lineItem['tax_amount'] = $this->getAmountWithCurrencyPrecision($item->getTaxes());
+                $lineItem['discount_amount'] = $this->getAmountWithCurrencyPrecision($item->getDiscount());
+                $lineItem['quantity'] = $item->getQuantity();
+                $lineItems[] = $lineItem;
+            }
+            $data['level3'] = array(
+                'merchant_reference' => $this->getTransactionId(),
+                'line_items' => $lineItems
+            );
+        }
 
         return $data;
+    }
+
+    private function getAmountWithCurrencyPrecision($amount)
+    {
+        return (int)round($amount * pow(10, $this->getCurrencyDecimalPlaces()));
+    }
+
+    private function validateLineItemAmounts(ItemBag $lineItems)
+    {
+        $actualAmount = 0;
+        foreach ($lineItems as $item) {
+            $actualAmount += $item->getQuantity() * $item->getPrice() + $item->getTaxes() - $item->getDiscount();
+        }
+        return $actualAmount == $this->getAmount();
     }
 }
