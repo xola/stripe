@@ -1,6 +1,7 @@
 <?php
 
 namespace Omnipay\Stripe\Util;
+
 use \Guzzle\Http\QueryAggregator\QueryAggregatorInterface;
 use \Guzzle\Http\QueryString;
 

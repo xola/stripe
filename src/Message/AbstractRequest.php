@@ -4,6 +4,7 @@
  * Stripe Abstract Request.
  */
 namespace Omnipay\Stripe\Message;
+
 use Guzzle\Common\Event;
 use Omnipay\Stripe\Util\StripeQueryAggregator;
 
@@ -173,7 +174,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         $this->httpClient->setConfig($config);
 
         // Use custom query aggregator because Stripe only supports a specific format
-        $this->httpClient->getEventDispatcher()->addListener('request.before_send', function(Event $event) {
+        $this->httpClient->getEventDispatcher()->addListener('request.before_send', function (Event $event) {
             $request = $event['request'];
             if ($request->getMethod() === 'POST') {
                 $request->getQuery()->setAggregator(new StripeQueryAggregator());
