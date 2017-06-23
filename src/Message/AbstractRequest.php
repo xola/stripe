@@ -4,6 +4,8 @@
  * Stripe Abstract Request.
  */
 namespace Omnipay\Stripe\Message;
+use Guzzle\Common\Event;
+use Omnipay\Stripe\Util\StripeQueryAggregator;
 
 /**
  * Stripe Abstract Request.
@@ -144,6 +146,23 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         return 'POST';
     }
 
+    /**
+     * Set the expand params for this request
+     *
+     * Use this to specify which fields should be returned in expanded form in the response
+     *
+     * @return AbstractRequest provides a fluent interface.
+     */
+    public function setExpand($value)
+    {
+        return $this->setParameter('expand', $value);
+    }
+
+    public function getExpand()
+    {
+        return $this->getParameter('expand');
+    }
+
     public function sendData($data)
     {
         // Stripe only accepts TLS >= v1.2, so make sure Curl is told
@@ -152,7 +171,15 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         $curlOptions[CURLOPT_SSLVERSION] = 6;
         $config->set('curl.options', $curlOptions);
         $this->httpClient->setConfig($config);
-        
+
+        // Use custom query aggregator because Stripe only supports a specific format
+        $this->httpClient->getEventDispatcher()->addListener('request.before_send', function(Event $event) {
+            $request = $event['request'];
+            if ($request->getMethod() === 'POST') {
+                $request->getQuery()->setAggregator(new StripeQueryAggregator());
+            }
+        });
+
         // don't throw exceptions for 4xx errors
         $this->httpClient->getEventDispatcher()->addListener(
             'request.error',

@@ -109,4 +109,20 @@ class PurchaseRequest extends AuthorizeRequest
         }
         return $actualAmount == $this->getAmount();
     }
+
+    public function getEndpoint()
+    {
+        $endPoint = $this->endpoint . '/charges';
+        $expandParams = $this->getExpand();
+        if ($expandParams && is_array($expandParams)) {
+            $endPoint = $endPoint . '?';
+            foreach ($expandParams as $idx => $param) {
+                $endPoint .= "expand[]=" . urlencode($param);
+                if ($idx !== count($expandParams) - 1) {
+                    $endPoint .= "&";
+                }
+            }
+        }
+        return $endPoint;
+    }
 }

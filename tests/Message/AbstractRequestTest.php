@@ -2,7 +2,9 @@
 
 namespace Omnipay\Stripe\Message;
 
+use Guzzle\Common\Event;
 use Mockery;
+use Omnipay\Stripe\Util\StripeQueryAggregator;
 use Omnipay\Tests\TestCase;
 
 class AbstractRequestTest extends TestCase
@@ -55,5 +57,43 @@ class AbstractRequestTest extends TestCase
     {
         $this->assertSame($this->request, $this->request->setMetadata(array('foo' => 'bar')));
         $this->assertSame(array('foo' => 'bar'), $this->request->getMetadata());
+    }
+
+    public function testExpand()
+    {
+        $this->assertSame($this->request, $this->request->setExpand(array('foo' => 'bar')));
+        $this->assertSame(array('foo' => 'bar'), $this->request->getExpand());
+    }
+
+    public function testShouldUseCustomQueryAggregatoar()
+    {
+        $this->setMockHttpResponse('PurchaseSuccess.txt');
+        $this->request = new AbstractRequestTest_MockAbstractRequest($this->getHttpClient(), $this->getHttpRequest());
+
+        $this->request->sendData(array());
+
+        $listeners = $this->getHttpClient()->getEventDispatcher()->getListeners();
+        $beforeSendListeners = $listeners['request.before_send'];
+        $this->assertCount(2, $beforeSendListeners);
+        $this->assertEquals(function(Event $event) {
+            $request = $event['request'];
+            if ($request->getMethod() === 'POST') {
+                $request->getQuery()->setAggregator(new StripeQueryAggregator());
+            }
+        }, $beforeSendListeners[1]);
+    }
+}
+
+class AbstractRequestTest_MockAbstractRequest extends AbstractRequest
+{
+
+    public function getEndpoint()
+    {
+       return '';
+    }
+
+    public function getData()
+    {
+        return array();
     }
 }
