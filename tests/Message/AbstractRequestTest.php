@@ -108,7 +108,7 @@ class AbstractRequestTest extends TestCase
         $this->assertSame(array('foo' => 'bar'), $this->request->getExpand());
     }
 
-    public function testShouldUseCustomQueryAggregatoar()
+    public function testShouldUseCustomQueryAggregator()
     {
         $this->setMockHttpResponse('PurchaseSuccess.txt');
         $this->request = new AbstractRequestTest_MockAbstractRequest($this->getHttpClient(), $this->getHttpRequest());
