@@ -3,6 +3,7 @@
 /**
  * Stripe Refund Request.
  */
+
 namespace Omnipay\Stripe\Message;
 
 /**
@@ -45,7 +46,7 @@ namespace Omnipay\Stripe\Message;
  * </code>
  *
  * @see PurchaseRequest
- * @see Omnipay\Stripe\Gateway
+ * @see \Omnipay\Stripe\Gateway
  * @link https://stripe.com/docs/api#create_refund
  */
 class RefundRequest extends AbstractRequest
@@ -79,7 +80,7 @@ class RefundRequest extends AbstractRequest
     }
 
     /**
-     * @return bool Whether the charge transfer should be reversed
+     * @return bool Whether the transfer should be reversed
      */
     public function getReverseTransfer()
     {
@@ -87,14 +88,18 @@ class RefundRequest extends AbstractRequest
     }
 
     /**
-     * Whether to reverse the transfer associated with the charge.
+     * Whether to refund the application fee associated with a charge.
      *
-     * When refunding a charge that has a destination value, by default the destination account will keep the funds that
-     * were transferred to it, leaving the platform account to cover the negative balance from the refund. To pull back
-     * the funds from the connected account to cover the refund, set the reverse_transfer parameter to true when
-     * creating the refund
+     * From the {@link https://stripe.com/docs/connect/destination-charges#issuing-refunds Stripe docs}:
+     * Charges created on the platform account can be refunded using the
+     * platform account's secret key. When refunding a charge that has a
+     * `destination[account]`, by default the destination account keeps the
+     * funds that were transferred to it, leaving the platform account to
+     * cover the negative balance from the refund. To pull back the funds
+     * from the connected account to cover the refund, set the
+     * `reverse_transfer` parameter to true when creating the refund
      *
-     * @param bool $value Whether the transfer should be reversed or not
+     * @param bool $value Whether the transfer should be refunded
      *
      * @return \Omnipay\Common\Message\AbstractRequest
      */

@@ -3,10 +3,13 @@
 /**
  * Stripe Abstract Request.
  */
+
 namespace Omnipay\Stripe\Message;
 
 use Guzzle\Common\Event;
 use Omnipay\Stripe\Util\StripeQueryAggregator;
+
+use Omnipay\Common\Message\ResponseInterface;
 
 /**
  * Stripe Abstract Request.
@@ -32,8 +35,6 @@ use Omnipay\Stripe\Util\StripeQueryAggregator;
  *
  * @see \Omnipay\Stripe\Gateway
  * @link https://stripe.com/docs/api
- *
- * @method \Omnipay\Stripe\Message\Response send()
  */
 abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 {
@@ -133,6 +134,46 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         return $this->setParameter('metadata', $value);
     }
 
+    /**
+     * Connect only
+     *
+     * @return mixed
+     */
+    public function getConnectedStripeAccountHeader()
+    {
+        return $this->getParameter('connectedStripeAccount');
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return \Omnipay\Common\Message\AbstractRequest
+     */
+    public function setConnectedStripeAccountHeader($value)
+    {
+        return $this->setParameter('connectedStripeAccount', $value);
+    }
+
+    /**
+     * Connect only
+     *
+     * @return mixed
+     */
+    public function getIdempotencyKeyHeader()
+    {
+        return $this->getParameter('idempotencyKey');
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return \Omnipay\Common\Message\AbstractRequest
+     */
+    public function setIdempotencyKeyHeader($value)
+    {
+        return $this->setParameter('idempotencyKey', $value);
+    }
+
     abstract public function getEndpoint();
 
     /**
@@ -164,11 +205,89 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         return $this->getParameter('expand');
     }
 
-    public function sendData($data)
+    /**
+     * @return array
+     */
+    public function getHeaders()
+    {
+        $headers = array();
+
+        if ($this->getConnectedStripeAccountHeader()) {
+            $headers['Stripe-Account'] = $this->getConnectedStripeAccountHeader();
+        }
+
+        if ($this->getIdempotencyKeyHeader()) {
+            $headers['Idempotency-Key'] = $this->getIdempotencyKeyHeader();
+        }
+
+        $apiVersion = $this->getApiVersion();
+        if (!empty($apiVersion)) {
+            // If user has set an API version use that https://stripe.com/docs/api#versioning
+            $headers['Stripe-Version'] = $this->getApiVersion();
+        }
+
+        return $headers;
+    }
+
+    /**
+     * Send the request
+     *
+     * @return ResponseInterface
+     */
+    public function send()
+    {
+        $data    = $this->getData();
+        $headers = array_merge(
+            $this->getHeaders(),
+            array('Authorization' => 'Basic ' . base64_encode($this->getApiKey() . ':'))
+        );
+
+        return $this->sendData($data, $headers);
+    }
+
+    public function sendData($data, array $headers = null)
+    {
+        $httpRequest  = $this->createClientRequest($data, $headers);
+        $httpResponse = $httpRequest->send();
+
+        $this->response = new Response($this, $httpResponse->json());
+
+        if ($httpResponse->hasHeader('Request-Id')) {
+            $this->response->setRequestId((string) $httpResponse->getHeader('Request-Id'));
+        }
+
+        return $this->response;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSource()
+    {
+        return $this->getParameter('source');
+    }
+
+    /**
+     * @param $value
+     *
+     * @return AbstractRequest provides a fluent interface.
+     */
+    public function setSource($value)
+    {
+        return $this->setParameter('source', $value);
+    }
+
+    /**
+     * @param       $data
+     * @param array $headers
+     *
+     * @return \Guzzle\Http\Message\RequestInterface
+     */
+    protected function createClientRequest($data, array $headers = null)
     {
         // Stripe only accepts TLS >= v1.2, so make sure Curl is told
-        $config = $this->httpClient->getConfig();
-        $curlOptions = $config->get('curl.options');
+        $config                          = $this->httpClient->getConfig();
+        $curlOptions                     = $config->get('curl.options');
         $curlOptions[CURLOPT_SSLVERSION] = 6;
         $config->set('curl.options', $curlOptions);
         $this->httpClient->setConfig($config);
@@ -194,42 +313,11 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         $httpRequest = $this->httpClient->createRequest(
             $this->getHttpMethod(),
             $this->getEndpoint(),
-            null,
+            $headers,
             $data
         );
-        $httpRequest->setHeader('Authorization', 'Basic '.base64_encode($this->getApiKey().':'));
-        $apiVersion = $this->getApiVersion();
-        if (!empty($apiVersion)) {
-            // If user has set an API version use that https://stripe.com/docs/api#versioning
-            $httpRequest->setHeader('Stripe-Version', $this->getApiVersion());
-        }
-        $httpResponse = $httpRequest->send();
-        
-        $this->response = new Response($this, $httpResponse->json());
-        
-        if ($httpResponse->hasHeader('Request-Id')) {
-            $this->response->setRequestId((string) $httpResponse->getHeader('Request-Id'));
-        }
 
-        return $this->response;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getSource()
-    {
-        return $this->getParameter('source');
-    }
-
-    /**
-     * @param $value
-     *
-     * @return AbstractRequest provides a fluent interface.
-     */
-    public function setSource($value)
-    {
-        return $this->setParameter('source', $value);
+        return $httpRequest;
     }
 
 
@@ -270,6 +358,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         $data['address_line1'] = $card->getAddress1();
         $data['address_line2'] = $card->getAddress2();
         $data['address_city'] = $card->getCity();
+        $data['address_zip'] = $card->getPostcode();
         $data['address_state'] = $card->getState();
         $data['address_country'] = $card->getCountry();
         $data['email']           = $card->getEmail();
