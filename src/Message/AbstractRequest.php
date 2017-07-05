@@ -292,7 +292,8 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         $config->set('curl.options', $curlOptions);
         $this->httpClient->setConfig($config);
 
-        // Use custom query aggregator because Stripe only supports a specific format
+        // For query params with an array value, Stripe accepts only one format for aggregating these values. This type
+        // of query aggregation is not supported by default by Guzzle so we have to use a custom query aggregator
         $this->httpClient->getEventDispatcher()->addListener('request.before_send', function (Event $event) {
             $request = $event['request'];
             if ($request->getMethod() === 'POST') {

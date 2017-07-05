@@ -112,7 +112,7 @@ class PurchaseRequest extends AuthorizeRequest
 
     public function getEndpoint()
     {
-        $endPoint = $this->endpoint . '/charges';
+        $endPoint = parent::getEndpoint();
         $expandParams = $this->getExpand();
         if ($expandParams && is_array($expandParams)) {
             $endPoint = $endPoint . '?';
