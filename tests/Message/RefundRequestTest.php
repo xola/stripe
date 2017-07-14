@@ -66,27 +66,4 @@ class RefundRequestTest extends TestCase
         $this->assertNull($response->getCardReference());
         $this->assertSame('Charge ch_12RgN9L7XhO9mI has already been refunded.', $response->getMessage());
     }
-
-    public function testShouldReturnEndpointWhenExpandParamNotPresent()
-    {
-        $endPoint = $this->request->getEndpoint();
-
-        $this->assertEquals("https://api.stripe.com/v1/charges/ch_12RgN9L7XhO9mI/refund", $endPoint);
-    }
-
-    public function testShouldAppendExpandQueryParamsToEndpointIfPresent()
-    {
-        $this->request->initialize(
-            array(
-                'amount' => '10.00',
-                'transactionReference' => "ch_12RgN9L7XhO9mI",
-                'expand' => array('foo', 'bar')
-            )
-        );
-        $expected ="https://api.stripe.com/v1/charges/ch_12RgN9L7XhO9mI/refund?expand[]=foo&expand[]=bar";
-
-        $endPoint = $this->request->getEndpoint();
-
-        $this->assertEquals($expected, $endPoint);
-    }
 }

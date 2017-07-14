@@ -128,17 +128,6 @@ class RefundRequest extends AbstractRequest
 
     public function getEndpoint()
     {
-        $endPoint = $this->endpoint.'/charges/'.$this->getTransactionReference().'/refund';
-        $expandParams = $this->getExpand();
-        if ($expandParams && is_array($expandParams)) {
-            $endPoint = $endPoint . '?';
-            foreach ($expandParams as $idx => $param) {
-                $endPoint .= "expand[]=" . urlencode($param);
-                if ($idx !== count($expandParams) - 1) {
-                    $endPoint .= "&";
-                }
-            }
-        }
-        return $endPoint;
+        return $this->endpoint.'/charges/'.$this->getTransactionReference().'/refund';
     }
 }
