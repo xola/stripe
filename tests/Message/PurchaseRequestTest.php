@@ -241,4 +241,28 @@ class PurchaseRequestTest extends TestCase
         $this->assertNull($response->getCardReference());
         $this->assertSame('Your card was declined', $response->getMessage());
     }
+
+    public function testShouldReturnEndpointWhenExpandParamNotPresent()
+    {
+        $endPoint = $this->request->getEndpoint();
+
+        $this->assertEquals("https://api.stripe.com/v1/charges", $endPoint);
+    }
+
+    public function testShouldAppendExpandQueryParamsToEndpointIfPresent()
+    {
+        $this->request->initialize(
+            array(
+                'amount' => '10.00',
+                'currency' => 'USD',
+                'card' => $this->card,
+                'statementDescriptor' => "FOO",
+                'expand' => array('foo', 'bar')
+            )
+        );
+
+        $endPoint = $this->request->getEndpoint();
+
+        $this->assertEquals("https://api.stripe.com/v1/charges?expand[]=foo&expand[]=bar", $endPoint);
+    }
 }
