@@ -2,7 +2,9 @@
 
 namespace Omnipay\Stripe\Message;
 
+use Guzzle\Common\Event;
 use Mockery;
+use Omnipay\Stripe\Util\StripeQueryAggregator;
 use Omnipay\Tests\TestCase;
 
 class AbstractRequestTest extends TestCase
@@ -55,5 +57,86 @@ class AbstractRequestTest extends TestCase
     {
         $this->assertSame($this->request, $this->request->setMetadata(array('foo' => 'bar')));
         $this->assertSame(array('foo' => 'bar'), $this->request->getMetadata());
+    }
+
+    public function testIdempotencyKey()
+    {
+        $this->request->setIdempotencyKeyHeader('UUID');
+
+        $this->assertSame('UUID', $this->request->getIdempotencyKeyHeader());
+
+        $headers = $this->request->getHeaders();
+
+        $this->assertArrayHasKey('Idempotency-Key', $headers);
+        $this->assertSame('UUID', $headers['Idempotency-Key']);
+
+        $httpRequest = $this->getHttpClient()->createRequest(
+            'GET',
+            '/',
+            $headers,
+            array()
+        );
+
+        $this->assertTrue($httpRequest->hasHeader('Idempotency-Key'));
+    }
+
+
+    public function testConnectedStripeAccount()
+    {
+        $this->request->setConnectedStripeAccountHeader('ACCOUNT_ID');
+
+        $this->assertSame('ACCOUNT_ID', $this->request->getConnectedStripeAccountHeader());
+
+        $headers = $this->request->getHeaders();
+
+        $this->assertArrayHasKey('Stripe-Account', $headers);
+        $this->assertSame('ACCOUNT_ID', $headers['Stripe-Account']);
+
+        $httpRequest = $this->getHttpClient()->createRequest(
+            'GET',
+            '/',
+            $headers,
+            array()
+        );
+
+        $this->assertTrue($httpRequest->hasHeader('Stripe-Account'));
+    }
+
+    public function testExpand()
+    {
+        $this->assertSame($this->request, $this->request->setExpand(array('foo' => 'bar')));
+        $this->assertSame(array('foo' => 'bar'), $this->request->getExpand());
+    }
+
+    public function testShouldUseCustomQueryAggregator()
+    {
+        $this->setMockHttpResponse('PurchaseSuccess.txt');
+        $this->request = new AbstractRequestTest_MockAbstractRequest($this->getHttpClient(), $this->getHttpRequest());
+
+        $this->request->sendData(array());
+
+        $listeners = $this->getHttpClient()->getEventDispatcher()->getListeners();
+        $beforeSendListeners = $listeners['request.before_send'];
+        $this->assertCount(2, $beforeSendListeners);
+        $this->assertEquals(function(Event $event) {
+            $request = $event['request'];
+            if ($request->getMethod() === 'POST') {
+                $request->getQuery()->setAggregator(new StripeQueryAggregator());
+            }
+        }, $beforeSendListeners[1]);
+    }
+}
+
+class AbstractRequestTest_MockAbstractRequest extends AbstractRequest
+{
+
+    public function getEndpoint()
+    {
+       return '';
+    }
+
+    public function getData()
+    {
+        return array();
     }
 }
