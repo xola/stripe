@@ -265,4 +265,28 @@ class PurchaseRequestTest extends TestCase
 
         $this->assertEquals("https://api.stripe.com/v1/charges?expand[]=foo&expand[]=bar", $endPoint);
     }
+
+    public function testShouldSetMotoInPaymentDetailsIfMarkedMoto()
+    {
+        $this->request->initialize(
+            array(
+                'amount' => '10.00',
+                'currency' => 'USD',
+                'moto' => true,
+                'card' => $this->card,
+                'statementDescriptor' => "FOO",
+                'expand' => array('foo', 'bar')
+            )
+        );
+        $expected = [
+            'payment_method_details' => [
+               'card' => 'moto'
+            ]
+        ];
+
+        $data = $this->request->getData();
+
+
+        $this->assertArraySubset($expected, $data);
+    }
 }

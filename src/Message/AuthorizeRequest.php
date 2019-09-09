@@ -207,6 +207,24 @@ class AuthorizeRequest extends AbstractRequest
         return $this;
     }
 
+    /**
+     * Mark this charge as MOTO in the request
+     *
+     * Set to true if this payment was marked as MOTO and out of scope for SCA.
+     * https://stripe.com/docs/api/charges/object#charge_object-payment_method_details-card-moto
+     *
+     * @return AbstractRequest provides a fluent interface.
+     */
+    public function setMoto($value)
+    {
+        return $this->setParameter('moto', $value);
+    }
+
+    public function getMoto()
+    {
+        return $this->getParameter('moto');
+    }
+
     public function getData()
     {
         $this->validate('amount', 'currency');
