@@ -280,7 +280,7 @@ class PurchaseRequestTest extends TestCase
         );
         $expected = [
             'payment_method_details' => [
-               'card' => ['moto' => true]
+               'card' => ['moto' => 'true']
             ]
         ];
 

@@ -75,7 +75,7 @@ class PurchaseRequest extends AuthorizeRequest
         $data = parent::getData();
         $data['capture'] = 'true';
         if ($this->getMoto()) {
-            $data['payment_method_details'] = ['card' => ['moto' => true]];
+            $data['payment_method_details'] = ['card' => ['moto' => 'true']];
         }
         $items = $this->getItems();
         if ($items && $this->validateLineItemAmounts($items)) {
