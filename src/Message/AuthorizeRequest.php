@@ -5,6 +5,9 @@
  */
 namespace Omnipay\Stripe\Message;
 
+use Omnipay\Common\ItemBag;
+use Omnipay\Stripe\StripeItemBag;
+
 /**
  * Stripe Authorize Request.
  *
@@ -205,6 +208,30 @@ class AuthorizeRequest extends AbstractRequest
         $this->setParameter('receipt_email', $email);
 
         return $this;
+    }
+
+    /**
+     * A list of items in this order
+     *
+     * @return ItemBag|null A bag containing items in this order
+     */
+    public function getItems()
+    {
+        return $this->getParameter('items');
+    }
+
+    /**
+     * Set the items in this order
+     *
+     * @param array $items An array of items in this order
+     * @return AuthorizeRequest
+     */
+    public function setItems($items)
+    {
+        if ($items && !$items instanceof ItemBag) {
+            $items = new StripeItemBag($items);
+        }
+        return $this->setParameter('items', $items);
     }
 
     public function getData()
