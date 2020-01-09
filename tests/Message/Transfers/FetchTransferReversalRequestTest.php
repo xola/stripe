@@ -2,8 +2,9 @@
 
 namespace Omnipay\Stripe\Message\Transfers;
 
-use Guzzle\Http\Message\Response;
+use Omnipay\Stripe\Message\Response;
 use Omnipay\Tests\TestCase;
+use function GuzzleHttp\Psr7\parse_response;
 
 class FetchTransferReversalRequestTest extends TestCase
 {
@@ -36,10 +37,10 @@ class FetchTransferReversalRequestTest extends TestCase
     public function testSendSuccess()
     {
         $this->setMockHttpResponse(
-            array(Response::fromMessage(file_get_contents($this->mockDir.'/FetchTransferReversalSuccess.txt')))
+            array(parse_response(file_get_contents($this->mockDir.'/FetchTransferReversalSuccess.txt')))
         );
 
-        /** @var \Omnipay\Stripe\Message\Response $response */
+        /** @var Response $response */
         $response = $this->request->send();
 
         $this->assertTrue($response->isSuccessful());
@@ -51,7 +52,7 @@ class FetchTransferReversalRequestTest extends TestCase
     public function testSendFailure()
     {
         $this->setMockHttpResponse(
-            array(Response::fromMessage(file_get_contents($this->mockDir.'/FetchTransferReversalFailure.txt')))
+            array(parse_response(file_get_contents($this->mockDir.'/FetchTransferReversalFailure.txt')))
         );
         $response = $this->request->send();
 

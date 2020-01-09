@@ -22,24 +22,16 @@
             "homepage": "https://github.com/thephpleague/omnipay-stripe/contributors"
         }
     ],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/xola/omnipay-common"
-        }
-    ],
     "autoload": {
         "psr-4": { "Omnipay\\Stripe\\" : "src/" }
     },
     "require": {
-        "omnipay/common": "^2.5.4"
+        "ext-json": "*",
+        "omnipay/common": "^3"
     },
     "require-dev": {
-        "omnipay/tests": "~2.0"
+        "omnipay/tests": "^3"
     },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.0.x-dev"
-        }
-    }
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

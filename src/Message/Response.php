@@ -6,6 +6,7 @@
 namespace Omnipay\Stripe\Message;
 
 use Omnipay\Common\Message\AbstractResponse;
+use Omnipay\Common\Message\RequestInterface;
 
 /**
  * Stripe Response.
@@ -22,7 +23,19 @@ class Response extends AbstractResponse
      * @var string URL
      */
     protected $requestId = null;
-    
+
+    /**
+     * @var array
+     */
+    protected $headers = [];
+
+    public function __construct(RequestInterface $request, $data, $headers = [])
+    {
+        $this->request = $request;
+        $this->data = json_decode($data, true);
+        $this->headers = $headers;
+    }
+
     /**
      * Is the transaction successful?
      *
@@ -359,22 +372,16 @@ class Response extends AbstractResponse
 
         return null;
     }
-    
+
     /**
-     * @return string
+     * @return string|null
      */
     public function getRequestId()
     {
-        return $this->requestId;
-    }
+        if (isset($this->headers['Request-Id'])) {
+            return $this->headers['Request-Id'][0];
+        }
 
-    /**
-     * Set request id
-     *
-     * @return AbstractRequest provides a fluent interface.
-     */
-    public function setRequestId($requestId)
-    {
-        $this->requestId = $requestId;
+        return null;
     }
 }

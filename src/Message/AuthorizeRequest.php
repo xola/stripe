@@ -219,8 +219,8 @@ class AuthorizeRequest extends AbstractRequest
         $data['metadata'] = $this->getMetadata();
         $data['capture'] = 'false';
 
-        $apiVersion = $this->getApiVersion();
-        if (is_null($apiVersion) || (!is_null($apiVersion) && $apiVersion >= self::API_VERSION_STATEMENT_DESCRIPTOR)) {
+        $stripeVersion = $this->getStripeVersion();
+        if (is_null($stripeVersion) || (!is_null($stripeVersion) && $stripeVersion >= self::API_VERSION_STATEMENT_DESCRIPTOR)) {
             $data['statement_descriptor'] = $this->getStatementDescriptor();
         } else {
             $data['statement_description'] = $this->getStatementDescriptor();
