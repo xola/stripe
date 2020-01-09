@@ -13,6 +13,6 @@ cache:
     - $HOME/.composer/cache
 
 before_script:
-  - composer install --prefer-stable --no-interaction
+  - composer install --prefer-dist --no-interaction
 
 script: vendor/bin/phpcs --standard=PSR2 src && vendor/bin/phpunit --coverage-text
