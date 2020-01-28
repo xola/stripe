@@ -6,6 +6,9 @@ use Omnipay\Tests\TestCase;
 
 class VoidRequestTest extends TestCase
 {
+    /** @var VoidRequest */
+    private $request;
+
     public function setUp()
     {
         $this->request = new VoidRequest($this->getHttpClient(), $this->getHttpRequest());

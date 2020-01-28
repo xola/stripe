@@ -2,8 +2,9 @@
 
 namespace Omnipay\Stripe\Message\Transfers;
 
-use Guzzle\Http\Message\Response;
+use Omnipay\Stripe\Message\Response;
 use Omnipay\Tests\TestCase;
+use function GuzzleHttp\Psr7\parse_response;
 
 class UpdateTransferRequestTest extends TestCase
 {
@@ -45,9 +46,9 @@ class UpdateTransferRequestTest extends TestCase
     public function testSendSuccess()
     {
         $this->setMockHttpResponse(
-            array(Response::fromMessage(file_get_contents($this->mockDir.'/CreateTransferRequestSuccess.txt')))
+            array(parse_response(file_get_contents($this->mockDir.'/CreateTransferRequestSuccess.txt')))
         );
-        /** @var \Omnipay\Stripe\Message\Response $response */
+        /** @var Response $response */
         $response = $this->request->send();
 
         $this->assertTrue($response->isSuccessful());
@@ -59,7 +60,7 @@ class UpdateTransferRequestTest extends TestCase
     public function testSendFailure()
     {
         $this->setMockHttpResponse(
-            array(Response::fromMessage(file_get_contents($this->mockDir.'/FetchTransferFailure.txt')))
+            array(parse_response(file_get_contents($this->mockDir.'/FetchTransferFailure.txt')))
         );
         $response = $this->request->send();
 

@@ -2,13 +2,15 @@
 
 namespace Omnipay\Stripe\Message;
 
-use Guzzle\Common\Event;
+use GuzzleHttp\Psr7\Request;
 use Mockery;
-use Omnipay\Stripe\Util\StripeQueryAggregator;
 use Omnipay\Tests\TestCase;
 
 class AbstractRequestTest extends TestCase
 {
+    /** @var Mockery\Mock|AbstractRequest */
+    private $request;
+
     public function setUp()
     {
         $this->request = Mockery::mock('\Omnipay\Stripe\Message\AbstractRequest')->makePartial();
@@ -70,16 +72,14 @@ class AbstractRequestTest extends TestCase
         $this->assertArrayHasKey('Idempotency-Key', $headers);
         $this->assertSame('UUID', $headers['Idempotency-Key']);
 
-        $httpRequest = $this->getHttpClient()->createRequest(
+        $httpRequest = new Request(
             'GET',
             '/',
-            $headers,
-            array()
+            $headers
         );
 
         $this->assertTrue($httpRequest->hasHeader('Idempotency-Key'));
     }
-
 
     public function testConnectedStripeAccount()
     {
@@ -92,51 +92,38 @@ class AbstractRequestTest extends TestCase
         $this->assertArrayHasKey('Stripe-Account', $headers);
         $this->assertSame('ACCOUNT_ID', $headers['Stripe-Account']);
 
-        $httpRequest = $this->getHttpClient()->createRequest(
+        $httpRequest = new Request(
             'GET',
             '/',
-            $headers,
-            array()
+            $headers
         );
 
         $this->assertTrue($httpRequest->hasHeader('Stripe-Account'));
+    }
+
+    public function testStripeVersion()
+    {
+        $this->request->setStripeVersion('2019-05-16');
+
+        $this->assertSame('2019-05-16', $this->request->getStripeVersion());
+
+        $headers = $this->request->getHeaders();
+
+        $this->assertArrayHasKey('Stripe-Version', $headers);
+        $this->assertSame('2019-05-16', $headers['Stripe-Version']);
+
+        $httpRequest = new Request(
+            'GET',
+            '/',
+            $headers
+        );
+
+        $this->assertTrue($httpRequest->hasHeader('Stripe-Version'));
     }
 
     public function testExpand()
     {
         $this->assertSame($this->request, $this->request->setExpand(array('foo' => 'bar')));
         $this->assertSame(array('foo' => 'bar'), $this->request->getExpand());
-    }
-
-    public function testShouldUseCustomQueryAggregator()
-    {
-        $this->setMockHttpResponse('PurchaseSuccess.txt');
-        $this->request = new AbstractRequestTest_MockAbstractRequest($this->getHttpClient(), $this->getHttpRequest());
-
-        $this->request->sendData(array());
-
-        $listeners = $this->getHttpClient()->getEventDispatcher()->getListeners();
-        $beforeSendListeners = $listeners['request.before_send'];
-        $this->assertCount(2, $beforeSendListeners);
-        $this->assertEquals(function(Event $event) {
-            $request = $event['request'];
-            if ($request->getMethod() === 'POST') {
-                $request->getQuery()->setAggregator(new StripeQueryAggregator());
-            }
-        }, $beforeSendListeners[1]);
-    }
-}
-
-class AbstractRequestTest_MockAbstractRequest extends AbstractRequest
-{
-
-    public function getEndpoint()
-    {
-       return '';
-    }
-
-    public function getData()
-    {
-        return array();
     }
 }

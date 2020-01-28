@@ -158,9 +158,9 @@ class Gateway extends AbstractGateway
      *
      * @return Gateway provides a fluent interface
      */
-    public function setApiVersion($value)
+    public function setStripeVersion($value)
     {
-        return $this->setParameter('apiVersion', $value);
+        return $this->setParameter('stripeVersion', $value);
     }
 
     /**
@@ -168,9 +168,9 @@ class Gateway extends AbstractGateway
      *
      * @return string
      */
-    public function getApiVersion()
+    public function getStripeVersion()
     {
-        return $this->getParameter('apiVersion');
+        return $this->getParameter('stripeVersion');
     }
 
     /**
