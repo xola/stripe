@@ -77,6 +77,14 @@ class AuthorizeRequest extends AbstractRequest
     /**
      * @return mixed
      */
+    public function getTransferData()
+    {
+        return $this->getParameter('transferData');
+    }
+
+    /**
+     * @return mixed
+     */
     public function getDestination()
     {
         return $this->getParameter('destination');
@@ -90,6 +98,16 @@ class AuthorizeRequest extends AbstractRequest
     public function setDestination($value)
     {
         return $this->setParameter('destination', $value);
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return AbstractRequest provides a fluent interface.
+     */
+    public function setTransferData($value)
+    {
+        return $this->setParameter('transferData', $value);
     }
 
     /**
@@ -176,6 +194,32 @@ class AuthorizeRequest extends AbstractRequest
         return $this->setParameter('applicationFee', $value);
     }
 
+    /**
+     * @return float
+     */
+    public function getApplicationFeeAmount()
+    {
+        return $this->getParameter('applicationFeeAmount');
+    }
+
+    /**
+     * @return int
+     */
+    public function getApplicationFeeAmountInteger()
+    {
+        return (int) round($this->getApplicationFeeAmount() * pow(10, $this->getCurrencyDecimalPlaces()));
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return AbstractRequest provides a fluent interface.
+     */
+    public function setApplicationFeeAmount($value)
+    {
+        return $this->setParameter('applicationFeeAmount', $value);
+    }
+
     public function getStatementDescriptor()
     {
         return $this->getParameter('statementDescriptor');
@@ -226,7 +270,9 @@ class AuthorizeRequest extends AbstractRequest
             $data['statement_description'] = $this->getStatementDescriptor();
         }
 
-        if ($this->getDestination()) {
+        if ($this->getTransferData()) {
+            $data['transfer_data'] = $this->getTransferData();
+        } else if ($this->getDestination()) {
             $data['destination'] = $this->getDestination();
         }
 
@@ -234,7 +280,9 @@ class AuthorizeRequest extends AbstractRequest
             $data['on_behalf_of'] = $this->getOnBehalfOf();
         }
 
-        if ($this->getApplicationFee()) {
+        if ($this->getApplicationFeeAmount()) {
+            $data['application_fee_amount'] = $this->getApplicationFeeAmountInteger();
+        }  else if ($this->getApplicationFee()) {
             $data['application_fee'] = $this->getApplicationFeeInteger();
         }
 
