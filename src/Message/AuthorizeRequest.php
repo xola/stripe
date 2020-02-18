@@ -232,6 +232,18 @@ class AuthorizeRequest extends AbstractRequest
         return $this->setParameter('statementDescriptor', $value);
     }
 
+    public function getStatementDescriptorSuffix()
+    {
+        return $this->getParameter('statementDescriptorSuffix');
+    }
+
+    public function setStatementDescriptorSuffix($value)
+    {
+        $value = str_replace(array('<', '>', '"', '\''), '', $value);
+
+        return $this->setParameter('statementDescriptorSuffix', $value);
+    }
+
     /**
      * @return mixed
      */
@@ -265,7 +277,11 @@ class AuthorizeRequest extends AbstractRequest
 
         $apiVersion = $this->getApiVersion();
         if (is_null($apiVersion) || (!is_null($apiVersion) && $apiVersion >= self::API_VERSION_STATEMENT_DESCRIPTOR)) {
-            $data['statement_descriptor'] = $this->getStatementDescriptor();
+            if ($this->getStatementDescriptorSuffix()) {
+                $data['statement_descriptor_suffix'] = $this->getStatementDescriptorSuffix();
+            } else {
+                $data['statement_descriptor'] = $this->getStatementDescriptor();
+            }
         } else {
             $data['statement_description'] = $this->getStatementDescriptor();
         }
