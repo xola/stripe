@@ -166,6 +166,16 @@ class AuthorizeRequest extends AbstractRequest
         return (int) round($this->getApplicationFee() * pow(10, $this->getCurrencyDecimalPlaces()));
     }
 
+    /**
+     * @param string $value
+     *
+     * @return AbstractRequest provides a fluent interface.
+     */
+    public function setApplicationFee($value)
+    {
+        return $this->setParameter('applicationFee', $value);
+    }
+
     public function getStatementDescriptor()
     {
         return $this->getParameter('statementDescriptor');
