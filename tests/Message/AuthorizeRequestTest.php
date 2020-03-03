@@ -32,7 +32,7 @@ class AuthorizeRequestTest extends TestCase
         $this->assertSame('Order #42', $data['description']);
         $this->assertSame('false', $data['capture']);
         $this->assertSame(array('foo' => 'bar'), $data['metadata']);
-        $this->assertSame(100, $data['application_fee']);
+        $this->assertSame(100, $data['application_fee_amount']);
     }
 
     /**
@@ -69,7 +69,7 @@ class AuthorizeRequestTest extends TestCase
         $this->request->setStatementDescriptor('OMNIPAY');
         $data = $this->request->getData();
 
-        $this->assertSame('OMNIPAY', $data['statement_descriptor']);
+        $this->assertSame('OMNIPAY', $data['statement_descriptor_suffix']);
     }
 
     public function testDataWithSourceAndDestination()
@@ -79,7 +79,7 @@ class AuthorizeRequestTest extends TestCase
         $data = $this->request->getData();
 
         $this->assertSame('abc', $data['source']);
-        $this->assertSame('xyz', $data['destination']);
+        $this->assertSame('xyz', $data['transfer_data']['destination']);
     }
 
     public function testDataWithToken()
