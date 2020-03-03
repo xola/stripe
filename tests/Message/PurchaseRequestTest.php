@@ -45,7 +45,7 @@ class PurchaseRequestTest extends TestCase
                 'object' => 'card',
                 'email' => null
             ),
-            'statement_descriptor' => 'FOO',
+            'statement_descriptor_suffix' => 'FOO',
             'description' => null,
             'capture' => 'true',
             'metadata' => null
@@ -100,7 +100,7 @@ class PurchaseRequestTest extends TestCase
                 'object' => 'card',
                 'email' => null
             ),
-            'statement_descriptor' => 'BOBS ANTIQUES',
+            'statement_descriptor_suffix' => 'BOBS ANTIQUES',
             'description' => null,
             'capture' => 'true',
             'metadata' => null,
@@ -178,7 +178,7 @@ class PurchaseRequestTest extends TestCase
                 'object' => 'card',
                 'email' => null
             ),
-            'statement_descriptor' => 'BOBS ANTIQUES',
+            'statement_descriptor_suffix' => 'BOBS ANTIQUES',
             'description' => null,
             'capture' => 'true',
             'metadata' => null
@@ -195,7 +195,7 @@ class PurchaseRequestTest extends TestCase
 
         $data = $this->request->getData();
 
-        $this->assertFalse(isset($data['statement_descriptor']), 'statement_descriptor should not be used for older version of the API');
+        $this->assertFalse(isset($data['statement_descriptor_suffix']), 'statement_descriptor_suffix should not be used for older version of the API');
         $this->assertNotNull($data['statement_description'], 'statement_description should be used for this api version');
         $this->assertEquals('FOO', $data['statement_description']);
     }
