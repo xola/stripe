@@ -6,9 +6,6 @@
 
 namespace Omnipay\Stripe\Message;
 
-use Guzzle\Common\Event;
-use Omnipay\Stripe\Util\StripeQueryAggregator;
-
 use Omnipay\Common\Message\ResponseInterface;
 
 /**
@@ -65,14 +62,14 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         return $this->setParameter('apiKey', $value);
     }
 
-    public function getApiVersion()
+    public function getStripeVersion()
     {
-        return $this->getParameter('apiVersion');
+        return $this->getParameter('stripeVersion');
     }
 
-    public function setApiVersion($value)
+    public function setStripeVersion($value)
     {
-        return $this->setParameter('apiVersion', $value);
+        return $this->setParameter('stripeVersion', $value);
     }
 
     /**
@@ -147,7 +144,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     /**
      * @param string $value
      *
-     * @return \Omnipay\Common\Message\AbstractRequest
+     * @return AbstractRequest
      */
     public function setConnectedStripeAccountHeader($value)
     {
@@ -167,7 +164,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     /**
      * @param string $value
      *
-     * @return \Omnipay\Common\Message\AbstractRequest
+     * @return AbstractRequest
      */
     public function setIdempotencyKeyHeader($value)
     {
@@ -220,10 +217,10 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
             $headers['Idempotency-Key'] = $this->getIdempotencyKeyHeader();
         }
 
-        $apiVersion = $this->getApiVersion();
-        if (!empty($apiVersion)) {
+        $stripeVersion = $this->getStripeVersion();
+        if (!empty($stripeVersion)) {
             // If user has set an API version use that https://stripe.com/docs/api#versioning
-            $headers['Stripe-Version'] = $this->getApiVersion();
+            $headers['Stripe-Version'] = $this->getStripeVersion();
         }
 
         return $headers;
@@ -247,16 +244,20 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 
     public function sendData($data, array $headers = null)
     {
-        $httpRequest  = $this->createClientRequest($data, $headers);
-        $httpResponse = $httpRequest->send();
+        $headers = array_merge(
+            $this->getHeaders(),
+            array('Authorization' => 'Basic ' . base64_encode($this->getApiKey() . ':'))
+        );
 
-        $this->response = new Response($this, $httpResponse->json());
+        $body = $data ? http_build_query($data, '', '&') : null;
+        $httpResponse = $this->httpClient->request($this->getHttpMethod(), $this->getEndpoint(), $headers, $body);
 
-        if ($httpResponse->hasHeader('Request-Id')) {
-            $this->response->setRequestId((string) $httpResponse->getHeader('Request-Id'));
-        }
+        return $this->createResponse($httpResponse->getBody()->getContents(), $httpResponse->getHeaders());
+    }
 
-        return $this->response;
+    protected function createResponse($data, $headers = [])
+    {
+        return $this->response = new Response($this, $data, $headers);
     }
 
     /**
@@ -276,51 +277,6 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     {
         return $this->setParameter('source', $value);
     }
-
-    /**
-     * @param       $data
-     * @param array $headers
-     *
-     * @return \Guzzle\Http\Message\RequestInterface
-     */
-    protected function createClientRequest($data, array $headers = null)
-    {
-        // Stripe only accepts TLS >= v1.2, so make sure Curl is told
-        $config                          = $this->httpClient->getConfig();
-        $curlOptions                     = $config->get('curl.options');
-        $curlOptions[CURLOPT_SSLVERSION] = 6;
-        $config->set('curl.options', $curlOptions);
-        $this->httpClient->setConfig($config);
-
-        // For query params with an array value, Stripe accepts only one format for aggregating these values. This type
-        // of query aggregation is not supported by default by Guzzle so we have to use a custom query aggregator
-        $this->httpClient->getEventDispatcher()->addListener('request.before_send', function (Event $event) {
-            $request = $event['request'];
-            if ($request->getMethod() === 'POST') {
-                $request->getQuery()->setAggregator(new StripeQueryAggregator());
-            }
-        });
-
-        // don't throw exceptions for 4xx errors
-        $this->httpClient->getEventDispatcher()->addListener(
-            'request.error',
-            function ($event) {
-                if ($event['response']->isClientError()) {
-                    $event->stopPropagation();
-                }
-            }
-        );
-
-        $httpRequest = $this->httpClient->createRequest(
-            $this->getHttpMethod(),
-            $this->getEndpoint(),
-            $headers,
-            $data
-        );
-
-        return $httpRequest;
-    }
-
 
     /**
      * Get the card data.
@@ -362,7 +318,7 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
         $data['address_zip'] = $card->getPostcode();
         $data['address_state'] = $card->getState();
         $data['address_country'] = $card->getCountry();
-        $data['email']           = $card->getEmail();
+        $data['email'] = $card->getEmail();
 
         return $data;
     }

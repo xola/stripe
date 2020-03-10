@@ -189,9 +189,9 @@ class PurchaseRequestTest extends TestCase
         $this->assertEquals($expected, $data);
     }
 
-    public function testShouldUseOlderKeyOfStatementDescriptorWhenApiVersionIsBeforeDec2014()
+    public function testShouldUseOlderKeyOfStatementDescriptorWhenStripeVersionIsBeforeDec2014()
     {
-        $this->request->setApiVersion('2014-06-17');
+        $this->request->setStripeVersion('2014-06-17');
 
         $data = $this->request->getData();
 
