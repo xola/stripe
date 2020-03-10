@@ -249,13 +249,13 @@ class AuthorizeRequest extends AbstractRequest
         $stripeVersion = $this->getStripeVersion();
         if (is_null($stripeVersion) || (!is_null($stripeVersion)
                 && $stripeVersion >= self::API_VERSION_STATEMENT_DESCRIPTOR)) {
-            $data['statement_descriptor'] = $this->getStatementDescriptor();
+            $data['statement_descriptor_suffix'] = $this->getStatementDescriptor();
         } else {
             $data['statement_description'] = $this->getStatementDescriptor();
         }
 
         if ($this->getDestination()) {
-            $data['destination'] = $this->getDestination();
+            $data['transfer_data'] = ['destination' => $this->getDestination()];
         }
 
         if ($this->getOnBehalfOf()) {
@@ -263,7 +263,7 @@ class AuthorizeRequest extends AbstractRequest
         }
 
         if ($this->getApplicationFee()) {
-            $data['application_fee'] = $this->getApplicationFeeInteger();
+            $data['application_fee_amount'] = $this->getApplicationFeeInteger();
         }
 
         if ($this->getTransferGroup()) {
